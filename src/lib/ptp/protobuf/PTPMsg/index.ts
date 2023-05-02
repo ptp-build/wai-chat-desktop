@@ -1,0 +1,12 @@
+export { default as DownloadMsgReq } from './DownloadMsgReq';
+export { default as DownloadMsgRes } from './DownloadMsgRes';
+export { default as GenMsgIdReq } from './GenMsgIdReq';
+export { default as GenMsgIdRes } from './GenMsgIdRes';
+export { default as RemoveMessagesReq } from './RemoveMessagesReq';
+export { default as RemoveMessagesRes } from './RemoveMessagesRes';
+export { default as SendBotMsgReq } from './SendBotMsgReq';
+export { default as SendBotMsgRes } from './SendBotMsgRes';
+export { default as UpdateCmdReq } from './UpdateCmdReq';
+export { default as UpdateCmdRes } from './UpdateCmdRes';
+export { default as UploadMsgReq } from './UploadMsgReq';
+export { default as UploadMsgRes } from './UploadMsgRes';
