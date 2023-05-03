@@ -1,23 +1,22 @@
 {
-  "name": "wai-electron",
+  "name": "wai-chat-bot-electron-chatgpt",
   "productName": "wai-electron",
   "version": "1.0.0",
-  "description": "My Electron application description",
+  "description": "a electron project for chatgpt wai chat bot",
   "main": ".webpack/main",
   "scripts": {
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
-    "lint": "eslint --ext .ts,.tsx .",
-    "rebuild": "electron-rebuild -f -w robojs"
+    "lint": "eslint --ext .ts,.tsx ."
   },
   "keywords": [],
   "author": {
-    "name": "ptp-build",
-    "email": "127082179+ptp-build@users.noreply.github.com"
+    "name": "barry",
+    "email": "barry.ptp.build@gmail.com"
   },
-  "license": "MIT",
+  "license": "GNU V3",
   "devDependencies": {
     "@electron-forge/cli": "^6.0.0-beta.70",
     "@electron-forge/maker-deb": "^6.0.0-beta.70",
@@ -34,7 +33,6 @@
     "crypto-browserify": "^3.12.0",
     "css-loader": "^6.0.0",
     "electron": "24.1.3",
-    "electron-rebuild": "^3.2.9",
     "elliptic": "^6.5.4",
     "eslint": "^8.0.1",
     "eslint-plugin-import": "^2.25.0",
@@ -58,7 +56,6 @@
     "npm": "^9.6.5",
     "portastic": "^1.0.1",
     "protobufjs": "^7.2.2",
-    "robotjs": "^0.6.0",
     "utf-8-validate": "^5.0.10",
     "ws": "^8.13.0"
   }

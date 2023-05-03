@@ -1,5 +1,4 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
-import robot from 'robotjs';
 import { BotWsServer } from './worker/share/service/BotWsServer';
 import { SendBotMsgRes } from './lib/ptp/protobuf/PTPMsg';
 import { runPyCode } from './worker/share/rpa/autogui';
@@ -91,8 +90,6 @@ pyautogui.click()
         botWsServer.sendToClient(new SendBotMsgRes({ reply, msgId, chatId, streamStatus }).pack());
         break;
       case 'onClickWindow':
-        const mouse = robot.getMousePos();
-        console.log(`robot.moveMouse(${mouse.x},${mouse.y});`);
         break;
     }
   });
