@@ -29,3 +29,13 @@
 import './index.css';
 
 console.log('👋 This message is being logged by "renderer.js", included via webpack');
+window.addEventListener('onRecvMessage', async (e: any) => {
+  console.log('[onRecvMessage]1', e.detail);
+});
+
+function hello() {
+  console.log('world');
+  console.log(document.body.innerText);
+}
+// @ts-ignore
+window.hello = hello;

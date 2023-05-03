@@ -1,41 +1,49 @@
 import WebSocket from 'ws';
 import { Pdu } from '../../../lib/ptp/protobuf/BaseMsg';
-import { getActionCommandsName } from '../../../lib/ptp/protobuf/ActionCommands';
 import MsgDispatcher from './MsgDispatcher';
 import { currentTs1000 } from '../utils/utils';
 import * as net from 'net';
 import { exec } from 'child_process';
+import { EventEmitter } from 'events';
 
-export class BotWsServer {
+export class BotWsServer extends EventEmitter {
   private port: number;
-  private wss?: WebSocket.Server;
-  constructor(port: number) {
-    this.port = port;
+  private socketServer?: WebSocket.Server;
+  private ws: WebSocket.WebSocket;
+  sendMsgToRender(action: string, payload?: any) {
+    if (this) {
+      this.emit('onBotWsMessage', {
+        action,
+        payload,
+      });
+    }
   }
-
-  async start() {
-    const { port } = this;
+  sendToClient(pdu: Pdu) {
+    if (this.ws) {
+      this.ws.send(pdu.getPbData());
+    }
+  }
+  async start(port: number) {
+    this.port = port;
 
     // 检查端口是否被占用
     const isPortUsed = await this.isPortInUse(this.port);
 
     if (isPortUsed) {
       console.log(`Port ${this.port} is in use. Killing the process...`);
-
-      // 杀死占用端口的进程
       await this.killProcessUsingPort(this.port);
     }
-    // WebSocket server
-    const wss = (this.wss = new WebSocket.Server({ port }));
+    const socketServer = (this.socketServer = new WebSocket.Server({ port }));
     const accountId = currentTs1000().toString();
     const msgDispatcher = MsgDispatcher.getInstance(accountId);
-    msgDispatcher.setWs(wss);
-    wss.on('connection', ws => {
+    socketServer.on('connection', ws => {
+      this.ws = ws;
       console.log('Client connected');
+      msgDispatcher.setWsBot(this);
+      this.sendMsgToRender('clientConnected');
       ws.on('message', async (msg: Buffer) => {
         try {
           const pdu = new Pdu(Buffer.from(msg));
-          console.log('[message]', getActionCommandsName(pdu.getCommandId()));
           await MsgDispatcher.handleWsMsg(accountId, pdu);
         } catch (err) {
           console.error(err);
@@ -50,14 +58,18 @@ export class BotWsServer {
     console.log('WebSocket server is running on ws://localhost:' + this.port);
   }
   close() {
-    if (this.wss) {
-      this.wss.close();
+    if (this.socketServer) {
+      if (this.ws) {
+        this.ws.close();
+        this.ws = null;
+      }
+      this.socketServer.close();
+      this.socketServer = null;
     }
   }
   private isPortInUse(port: number): Promise<boolean> {
     return new Promise(resolve => {
       const server = net.createServer();
-
       server.once('error', (err: any) => {
         if (err.code === 'EADDRINUSE') {
           resolve(true);
