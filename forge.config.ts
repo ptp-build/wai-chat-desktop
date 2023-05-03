@@ -1,3 +1,18 @@
+import { ResolvedForgeConfig } from '@electron-forge/shared-types/src';
+const myCustomPlugin = {
+  name: '@electron-forge/publisher-github',
+  init: (dir: string, forgeConfig: ResolvedForgeConfig) => {
+    // Plugin initialization logic here
+  },
+  config: {
+    repository: {
+      owner: 'ptp-build',
+      name: 'wai-chat-bot-electron-chatgpt',
+      draft: true,
+    },
+  },
+};
+
 module.exports = {
   packagerConfig: {},
   rebuildConfig: {},
@@ -20,16 +35,7 @@ module.exports = {
     },
   ],
   plugins: [
-    {
-      name: '@electron-forge/publisher-github',
-      config: {
-        repository: {
-          owner: 'ptp-build',
-          name: 'wai-chat-bot-electron-chatgpt',
-          draft: true,
-        },
-      },
-    },
+    myCustomPlugin,
     {
       name: '@electron-forge/plugin-webpack',
       config: {
