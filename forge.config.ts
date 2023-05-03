@@ -21,6 +21,16 @@ module.exports = {
   ],
   plugins: [
     {
+      name: '@electron-forge/publisher-github',
+      config: {
+        repository: {
+          owner: 'ptp-build',
+          name: 'wai-chat-bot-electron-chatgpt',
+          draft: true,
+        },
+      },
+    },
+    {
       name: '@electron-forge/plugin-webpack',
       config: {
         mainConfig: './webpack.main.config.js',
