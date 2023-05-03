@@ -1,13 +1,14 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import { BotWsServer } from './worker/share/service/BotWsServer';
 import { SendBotMsgRes } from './lib/ptp/protobuf/PTPMsg';
-import { runPyCode } from './worker/share/rpa/autogui';
 
-declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
 const WS_PORT = 1236;
 const OPEN_DEVTOOL = false;
+
+const chatGpt3_url = 'https://chat.openai.com/c/3cb7d4d3-c9b3-46a9-bff8-889cb614ae12';
+const chatGpt4_url = 'https://chat.openai.com/c/9bfc0438-5694-4ca1-a297-e67cfc5b265d';
 
 if (require('electron-squirrel-startup')) {
   app.quit();
@@ -36,9 +37,8 @@ const onBotWsMessage = ({ action, payload }: { action: string; payload: any }) =
 };
 const createWindow = (): void => {
   if (mainWindow) {
-    mainWindow.close();
-    mainWindow.destroy();
-    mainWindow = null;
+    mainWindow.focus();
+    return;
   }
   // 销毁旧的 devToolsWindow
   if (devToolsWindow) {
@@ -54,36 +54,24 @@ const createWindow = (): void => {
     y: 0,
     webPreferences: {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
+      nodeIntegration: false,
+      contextIsolation: true,
     },
   });
-  let url = 'https://chat.openai.com/c/3cb7d4d3-c9b3-46a9-bff8-889cb614ae12';
-  url = 'https://chat.openai.com/c/9bfc0438-5694-4ca1-a297-e67cfc5b265d';
-  mainWindow.loadURL(url).catch(console.error);
-  // mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
+  mainWindow.loadURL(chatGpt4_url).catch(console.error);
   mainWindow.webContents.on('did-finish-load', () => {
     mainWindow.webContents.on('console-message', (event, level, message, line, sourceId) => {
       console.log('>', message);
     });
-    setTimeout(() => {
-      botWsServer.start(WS_PORT).catch(console.error);
-      botWsServer.on('onBotWsMessage', onBotWsMessage);
-    });
+
     mainWindow.webContents.send('inject-scripts');
   });
-  ipcMain.on('onMainMessage', (event, args) => {
+  ipcMain.on('onMainMessage', async (event, args) => {
     const { action, payload } = args;
     console.log('[onMainMessage]', action, payload);
     switch (action) {
       case 'onSend':
         mainWindow.focus();
-        runPyCode(`
-import pyautogui
-import time
-pyautogui.moveTo(347, 710)
-pyautogui.click()
-pyautogui.moveTo(900, 705)
-pyautogui.click()
-`);
         break;
       case 'onRecvAiMsg':
         const { reply, msgId, chatId, streamStatus } = payload;
@@ -122,6 +110,18 @@ pyautogui.click()
     });
   }
 
+  mainWindow.on('ready-to-show', function () {
+    // var proxyIp = '83.97.23.90';
+    // var port = '18080';
+    // let my_proxy = proxyIp.trim() === 'noproxy' ? 'direct://' : 'http://' + proxyIp + ':' + port;
+    // session.defaultSession
+    //   .setProxy({ proxyRules: my_proxy })
+    //   .then(() => {
+    //     console.log('proxy: ' + my_proxy);
+    //   })
+    //   .catch(console.error);
+  });
+
   mainWindow.on('resize', () => {
     const [width, height] = mainWindow.getSize();
     console.log(`New window size: {width:${width}, height: ${height}}`);
@@ -143,9 +143,11 @@ if (!app.requestSingleInstanceLock()) {
     }
   });
 }
-
-app.on('ready', createWindow);
-
+app.on('ready', async () => {
+  await botWsServer.start(WS_PORT).catch(console.error);
+  botWsServer.on('onBotWsMessage', onBotWsMessage);
+  createWindow();
+});
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();

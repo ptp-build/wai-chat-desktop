@@ -75,23 +75,23 @@ export default class MsgDispatcher {
       );
     }
     if (chatGpt) {
-      this.sendPdu(
-        new SendBotMsgRes({
-          reply:
-            '```json\n' +
-            JSON.stringify(
-              {
-                chatGpt: JSON.parse(chatGpt),
-                msgId,
-                chatId,
-              },
-              null,
-              2
-            ) +
-            '```',
-        }).pack(),
-        pdu.getSeqNum()
-      );
+      // this.sendPdu(
+      //   new SendBotMsgRes({
+      //     reply:
+      //       '```json\n' +
+      //       JSON.stringify(
+      //         {
+      //           chatGpt: JSON.parse(chatGpt),
+      //           msgId,
+      //           chatId,
+      //         },
+      //         null,
+      //         2
+      //       ) +
+      //       '```',
+      //   }).pack(),
+      //   pdu.getSeqNum()
+      // );
       this.sendToRender('CID_SendBotMsgReq', {
         chatId,
         msgId,

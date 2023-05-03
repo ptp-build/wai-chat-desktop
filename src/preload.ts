@@ -15,6 +15,7 @@ class OpenAiStream {
   static lastText: string = '';
   static cache: Record<string, boolean> = {};
   static chatId: string;
+  static loading: boolean;
   static msgId: number;
 
   static handleMsgReply(message: string) {
@@ -27,6 +28,7 @@ class OpenAiStream {
     }
 
     if (v.startsWith('[ERROR]')) {
+      OpenAiStream.loading = false;
       console.log('[ERROR]', v);
       ipcRenderer.send('onMainMessage', {
         action: 'onRecvAiMsg',
@@ -40,9 +42,6 @@ class OpenAiStream {
       return;
     }
     if (v === '[START]') {
-      OpenAiStream.text = '';
-      OpenAiStream.lastText = '';
-      OpenAiStream.cache = {};
       ipcRenderer.send('onMainMessage', {
         action: 'onRecvAiMsg',
         payload: {
@@ -69,7 +68,6 @@ class OpenAiStream {
               if (!OpenAiStream.cache[part]) {
                 OpenAiStream.cache[part] = true;
                 const msgText = part.replace(OpenAiStream.lastText, '');
-                console.log('====>>', msgText);
                 ipcRenderer.send('onMainMessage', {
                   action: 'onRecvAiMsg',
                   payload: {
@@ -84,6 +82,7 @@ class OpenAiStream {
             } catch (e) {}
           } else {
             if (line === '[DONE]') {
+              OpenAiStream.loading = false;
               const msgLine = lines[i - 1];
               const msg = JSON.parse(msgLine.trim());
               const msgText = msg.message.content.parts[0];
@@ -104,6 +103,15 @@ class OpenAiStream {
       }
     }
   }
+
+  static init(chatId: string, msgId: number) {
+    OpenAiStream.chatId = chatId;
+    OpenAiStream.msgId = msgId;
+    OpenAiStream.text = '';
+    OpenAiStream.lastText = '';
+    OpenAiStream.cache = {};
+    OpenAiStream.loading = true;
+  }
 }
 
 contextBridge.exposeInMainWorld('WaiApi', {
@@ -117,20 +125,25 @@ window.addEventListener('DOMContentLoaded', () => {
   const script = document.createElement('script');
 
   script.innerHTML = `
+  
+  const script = document.createElement('script');
+  script.src = 'https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js';
+  document.head.appendChild(script);
+  
    (function() {
       const originalFetch = window.fetch;
       window.fetch = async function (...args) {
         const url = args[0];
         const options = args[1];
+        console.log("on fetch",url);
+
         if(options && options.signal && url.indexOf('backend-api/conversation') > 0){
-          console.log("on fetch",url);
           window.WaiApi.onMsgReplyFromOpenAiStream("[REQUEST] " + JSON.stringify(options))
         }
         const response = await originalFetch.apply(this, args);
         if(options && options.signal && url.indexOf('backend-api/conversation') > 0){
           if (response.ok) {
-            if(response.body && options){
-              
+            if(response.body && options){              
               const transformStream = new TransformStream({
                   transform(chunk, controller) {
                   // 将数据传递给原始调用方
@@ -159,8 +172,18 @@ window.addEventListener('DOMContentLoaded', () => {
         return response;
       };
     })();
+  window.addEventListener('sendText', event => {
+    if($("button[class*='bottom-[124px]']").length > 0){
+      $("button[class*='bottom-[124px]']").trigger("click")
+    }
+    const { text } = event.detail;
+    window.$('textarea').val(text)
+    window.$('textarea').next().removeAttr('disabled');
+    $('textarea').next().trigger('click');
+    console.log('[sendText]', text);
+  })
   `;
-  document.body.appendChild(script);
+  document.head.appendChild(script);
 });
 
 window.addEventListener('click', event => {
@@ -174,19 +197,11 @@ ipcRenderer.on('onRenderMessage', (event, args) => {
   const { action, payload } = args;
   switch (action) {
     case 'setText':
-      const { chatId, msgId } = payload;
-      OpenAiStream.chatId = chatId;
-      OpenAiStream.msgId = msgId;
-      document.querySelector('textarea').value = payload.text;
-      const buttons = document.querySelectorAll('button[disabled]');
-      buttons.forEach(button => {
-        button.removeAttribute('disabled');
-      });
-      document.querySelector('textarea').dispatchEvent(new Event('focus'));
-      document.querySelector('textarea').focus();
-      ipcRenderer.send('onMainMessage', {
-        action: 'onSend',
-      });
+      if (!OpenAiStream.loading) {
+        const { chatId, msgId } = payload;
+        OpenAiStream.init(chatId, msgId);
+        window.dispatchEvent(new CustomEvent('sendText', { detail: { text: payload.text } }));
+      }
       break;
   }
 });
