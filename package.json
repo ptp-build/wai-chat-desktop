@@ -1,7 +1,7 @@
 {
   "name": "wai-chat-bot-electron-chatgpt",
   "productName": "wai-electron",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "a electron project for chatgpt wai chat bot",
   "main": ".webpack/main",
   "scripts": {
