@@ -24,10 +24,10 @@ module.exports = {
       name: '@electron-forge/publisher-github',
       config: {
         repository: {
-          owner: 'erikhofer',
-          name: 'hello-electron',
+          owner: 'ptp-build',
+          name: 'wai-chat-bot-electron-chatgpt',
+          draft: true,
         },
-        draft: true,
       },
     },
   ],
