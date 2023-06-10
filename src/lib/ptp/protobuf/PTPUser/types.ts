@@ -1,26 +1,42 @@
 // DO NOT EDIT
 import type * as PTPCommon from '../PTPCommon/types';
 
+export interface CreateUserReq_Type {
+  username: string;
+}
+export interface CreateUserRes_Type {}
 export interface DownloadUserReq_Type {
-  userIds?: string[];
+  userId: string;
+  updatedAt?: number;
 }
 export interface DownloadUserRes_Type {
-  users?: PTPCommon.UserStoreRow_Type[];
+  userBuf?: Buffer;
   err?: PTPCommon.ERR;
 }
-export interface GenUserIdReq_Type {}
+export interface FetchBotSettingReq_Type {
+  key: string;
+}
+export interface FetchBotSettingRes_Type {
+  key: string;
+  value: string;
+}
+export interface GenUserIdReq_Type {
+  username?: string;
+}
 export interface GenUserIdRes_Type {
-  userId: number;
+  userId?: number;
   err: PTPCommon.ERR;
 }
+export interface SaveBotSettingReq_Type {
+  key: string;
+  value: string;
+}
+export interface SaveBotSettingRes_Type {
+  err?: PTPCommon.ERR;
+}
 export interface ShareBotReq_Type {
-  userId: string;
-  firstName: string;
-  avatarHash?: string;
-  bio: string;
-  init_system_content?: string;
-  welcome?: string;
-  template?: string;
+  catTitle: string;
+  catBot: PTPCommon.PbCatBot_Type;
 }
 export interface ShareBotRes_Type {
   err?: PTPCommon.ERR;
@@ -32,8 +48,7 @@ export interface ShareBotStopRes_Type {
   err?: PTPCommon.ERR;
 }
 export interface UploadUserReq_Type {
-  users?: PTPCommon.UserStoreRow_Type[];
-  time: number;
+  userBuf: Buffer;
 }
 export interface UploadUserRes_Type {
   err?: PTPCommon.ERR;

@@ -1,6 +1,5 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
-import { BotWsServer } from './worker/share/service/BotWsServer';
-import { SendBotMsgRes } from './lib/ptp/protobuf/PTPMsg';
+import * as path from 'path';
 
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
@@ -17,7 +16,7 @@ if (require('electron-squirrel-startup')) {
 let mainWindow: BrowserWindow | null;
 let devToolsWindow: BrowserWindow;
 
-const botWsServer = new BotWsServer();
+// const botWsServer = new BotWsServer();
 
 const onBotWsMessage = ({ action, payload }: { action: string; payload: any }) => {
   console.log('[onBotWsMessage]', action, payload);
@@ -48,17 +47,22 @@ const createWindow = (): void => {
   }
 
   mainWindow = new BrowserWindow({
-    width: 930,
-    height: 760,
+    width: 1280,
+    height: 800,
     x: 0,
     y: 0,
+    title: 'Wai Chat',
     webPreferences: {
-      preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
+      // preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
+      preload: path.join(__dirname, 'js', 'preload.js'),
       nodeIntegration: false,
       contextIsolation: true,
     },
   });
-  mainWindow.loadURL(chatGpt4_url).catch(console.error);
+  mainWindow.loadFile(path.join(__dirname, 'assets', 'index.html'));
+  // mainWindow.loadURL(`file://${path.join(__dirname, 'index.html')}`);
+  // mainWindow.loadURL('http://localhost:1234').catch(console.error);
+
   mainWindow.webContents.on('did-finish-load', () => {
     mainWindow.webContents.on('console-message', (event, level, message, line, sourceId) => {
       console.log('>', message);
@@ -75,7 +79,7 @@ const createWindow = (): void => {
         break;
       case 'onRecvAiMsg':
         const { reply, msgId, chatId, streamStatus } = payload;
-        botWsServer.sendToClient(new SendBotMsgRes({ reply, msgId, chatId, streamStatus }).pack());
+        // botWsServer.sendToClient(new SendBotMsgRes({ reply, msgId, chatId, streamStatus }).pack());
         break;
       case 'onClickWindow':
         break;
@@ -144,8 +148,8 @@ if (!app.requestSingleInstanceLock()) {
   });
 }
 app.on('ready', async () => {
-  await botWsServer.start(WS_PORT).catch(console.error);
-  botWsServer.on('onBotWsMessage', onBotWsMessage);
+  // await botWsServer.start(WS_PORT).catch(console.error);
+  // botWsServer.on('onBotWsMessage', onBotWsMessage);
   createWindow();
 });
 app.on('window-all-closed', () => {
@@ -155,10 +159,10 @@ app.on('window-all-closed', () => {
 });
 
 app.on('before-quit', () => {
-  if (botWsServer) {
-    botWsServer.removeListener('onBotWsMessage', onBotWsMessage);
-  }
-  botWsServer.close();
+  // if (botWsServer) {
+  //   botWsServer.removeListener('onBotWsMessage', onBotWsMessage);
+  // }
+  // botWsServer.close();
 });
 
 app.on('activate', () => {

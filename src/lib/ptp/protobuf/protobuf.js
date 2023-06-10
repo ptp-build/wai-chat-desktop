@@ -676,13 +676,16 @@ var $conv_message = $createConverter([
                     '@': {"EncryptType_Wallet":0,"EncryptType_Group":1,"EncryptType_Message":2,"EncryptType_Media":3}
                 },
                 ERR: {
-                    '@': {"NO_ERROR":0,"ERR_SYSTEM":1,"ERR_AUTH_LOGIN":2,"ERR_AUTH_NEED":3}
+                    '@': {"NO_ERROR":0,"ERR_SYSTEM":1,"ERR_AUTH_LOGIN":2,"ERR_AUTH_NEED":3,"ERR_NOT_FOUND":4}
                 },
                 FileInfo: {
                     '$': {"1":["id","string",""],"2":["size","uint64",{"low":0,"high":0,"unsigned":true}],"3":["part","uint32",0],"4":["part_total","uint32",0],"5":["buf","bytes",[]],"6":["type","string",""]}
                 },
                 MessageStoreRow: {
-                    '$': {"1":["message","default.PTP.Common.PbMsg",null],"3":["messageId","uint32",0],"4":["time","uint32",0],"5":["buf","bytes",[]]}
+                    '$': {"1":["messageId","uint32",0],"2":["buf","bytes",[]]}
+                },
+                MsgRow: {
+                    '$': {"1":["text","string",""],"2":["msgId","uint32",0],"3":["chatId","string",""],"4":["senderId","string",""],"5":["msgDate","uint32",0]}
                 },
                 PbAction: {
                     '$': {"1":["text","string",""],"2":["type","string",""]}
@@ -695,6 +698,9 @@ var $conv_message = $createConverter([
                 },
                 PbBotInfo: {
                     '$': {"1":["botId","string",""],"2":["description","string",""],"4":["menuButton","default.PTP.Common.PbMenuButton",null],"5":["commands","<default.PTP.Common.PbCommands",null],"6":["photo","default.PTP.Common.PbPhoto",null],"7":["aiBot","default.PTP.Common.PbAiBot",null]}
+                },
+                PbCatBot: {
+                    '$': {"1":["cat","string",""],"2":["userId","string",""],"3":["firstName","string",""],"4":["avatarHash","string",""],"5":["bio","string",""],"6":["init_system_content","string",""],"7":["welcome","string",""],"8":["outputText","string",""],"9":["template","string",""],"10":["templateSubmit","string",""],"11":["time","uint64",{"low":0,"high":0,"unsigned":true}]}
                 },
                 PbChat: {
                     '$': {"1":["type","string",""],"2":["id","string",""],"3":["title","string",""],"4":["usernames","<default.PTP.Common.PbUsernames",null],"5":["isMuted","bool",false],"6":["isMin","bool",false],"7":["hasPrivateLink","bool",false],"8":["isSignaturesShown","bool",false],"9":["accessHash","string",""],"10":["isVerified","bool",false],"11":["isJoinToSend","bool",false],"12":["isJoinRequest","bool",false],"13":["isForum","bool",false],"14":["isListed","bool",false],"15":["settings","default.PTP.Common.PbSettings",null],"16":["lastMessage","default.PTP.Common.PbMsg",null]}
@@ -730,7 +736,7 @@ var $conv_message = $createConverter([
                     '$': {"1":["type","string",""],"2":["offset","uint32",0],"3":["length","uint32",0],"4":["documentId","string",""],"5":["userId","string",""],"6":["url","string",""],"7":["language","string",""],"8":["cipher","string",""],"9":["hint","string",""]}
                 },
                 PbMsg: {
-                    '$': {"1":["id","uint32",0],"2":["chatId","string",""],"3":["content","default.PTP.Common.PbContent",null],"4":["date","uint32",0],"5":["isOutgoing","bool",false],"6":["senderId","string",""],"7":["isForwardingAllowed","bool",false],"8":["previousLocalId","double",0],"9":["views","uint32",0],"10":["repliesThreadInfo","default.PTP.Common.PbRepliesThreadInfo",null],"11":["reactions","default.PTP.Common.PbReactions",null]}
+                    '$': {"1":["id","uint32",0],"2":["chatId","string",""],"3":["content","default.PTP.Common.PbContent",null],"4":["date","uint32",0],"5":["isOutgoing","bool",false],"6":["senderId","string",""],"7":["isForwardingAllowed","bool",false],"8":["previousLocalId","double",0],"9":["views","uint32",0],"10":["repliesThreadInfo","default.PTP.Common.PbRepliesThreadInfo",null],"11":["reactions","default.PTP.Common.PbReactions",null],"12":["replyToMessageId","uint32",0],"13":["replyToUserId","string",""]}
                 },
                 PbPhoto: {
                     '$': {"1":["id","string",""],"2":["thumbnail","default.PTP.Common.PbThumbnail",null],"3":["sizes","<default.PTP.Common.PbSizes",null],"4":["isSpoiler","bool",false]}
@@ -763,7 +769,7 @@ var $conv_message = $createConverter([
                     '$': {"1":["width","uint32",0],"2":["height","uint32",0],"3":["dataUri","string",""]}
                 },
                 PbUser: {
-                    '$': {"1":["id","string",""],"2":["firstName","string",""],"3":["usernames","<default.PTP.Common.PbUsernames",null],"4":["isMin","bool",false],"5":["isPremium","bool",false],"6":["type","string",""],"7":["hasVideoAvatar","bool",false],"8":["canBeInvitedToGroup","bool",false],"9":["phoneNumber","string",""],"10":["noStatus","bool",false],"11":["accessHash","string",""],"12":["fullInfo","default.PTP.Common.PbFullInfo",null],"13":["lastName","string",""],"14":["isSelf","bool",false],"15":["avatarHash","string",""],"16":["photos","<default.PTP.Common.PbPhoto",null]}
+                    '$': {"1":["id","string",""],"2":["firstName","string",""],"3":["usernames","<default.PTP.Common.PbUsernames",null],"4":["isMin","bool",false],"5":["isPremium","bool",false],"6":["type","string",""],"7":["hasVideoAvatar","bool",false],"8":["canBeInvitedToGroup","bool",false],"9":["phoneNumber","string",""],"10":["noStatus","bool",false],"11":["accessHash","string",""],"12":["fullInfo","default.PTP.Common.PbFullInfo",null],"13":["lastName","string",""],"14":["isSelf","bool",false],"15":["avatarHash","string",""],"16":["photos","<default.PTP.Common.PbPhoto",null],"17":["updatedAt","uint32",0]}
                 },
                 PbUsernames: {
                     '$': {"1":["username","string",""],"2":["isActive","bool",false],"3":["isEditable","bool",false]}
@@ -799,17 +805,29 @@ var $conv_message = $createConverter([
                 }
             },
             Msg: {
+                CallbackButtonReq: {
+                    '$': {"1":["chatId","string",""],"2":["data","string",""]}
+                },
+                CallbackButtonRes: {
+                    '$': {"1":["text","string",""],"2":["inlineButtons","string",""],"3":["chatId","string",""],"100":["err","uint32",0]}
+                },
                 DownloadMsgReq: {
-                    '$': {"1":["chatId","string",""]}
+                    '$': {"1":["chatId","string",""],"2":["msgIds","[uint32",null]}
                 },
                 DownloadMsgRes: {
-                    '$': {"1":["messages","<default.PTP.Common.MessageStoreRow",null],"100":["err","uint32",0]}
+                    '$': {"1":["chatId","string",""],"2":["msgList","<default.PTP.Common.PbMsg",null]}
                 },
                 GenMsgIdReq: {
                     '$': {"1":["isLocal","bool",false]}
                 },
                 GenMsgIdRes: {
                     '$': {"1":["messageId","uint64",{"low":0,"high":0,"unsigned":true}],"100":["err","uint32",0]}
+                },
+                MsgListReq: {
+                    '$': {"1":["chatId","string",""],"2":["msgIds","[uint32",null]}
+                },
+                MsgListRes: {
+                    '$': {"1":["chatId","string",""],"2":["msgList","<default.PTP.Common.MsgRow",null]}
                 },
                 RemoveMessagesReq: {
                     '$': {"1":["messageIds","[uint32",null],"2":["chatId","string",""]}
@@ -818,22 +836,28 @@ var $conv_message = $createConverter([
                     '$': {"100":["err","uint32",0]}
                 },
                 SendBotMsgReq: {
-                    '$': {"1":["chatId","string",""],"2":["botApi","string",""],"3":["text","string",""],"4":["chatGpt","string",""],"5":["msgId","uint32",0]}
+                    '$': {"1":["chatId","string",""],"2":["botApi","string",""],"3":["text","string",""],"4":["chatGpt","string",""],"5":["msgId","uint32",0],"6":["msgDate","uint32",0],"7":["msgAskId","uint32",0],"8":["msgAskDate","uint32",0]}
                 },
                 SendBotMsgRes: {
                     '$': {"1":["reply","string",""],"2":["chatId","string",""],"3":["msgId","uint32",0],"4":["streamStatus","uint32",0],"5":["message","default.PTP.Common.PbMsg",null]}
                 },
+                SendMsgRes: {
+                    '$': {"1":["replyText","string",""],"2":["chatId","string",""],"3":["msgId","uint32",0],"4":["senderId","string",""],"6":["date","uint32",0],"7":["inlineButtons","string",""],"8":["replyToMsgId","uint64",{"low":0,"high":0,"unsigned":true}]}
+                },
+                SendTextMsgReq: {
+                    '$': {"7":["msg","bytes",[]]}
+                },
                 UpdateCmdReq: {
-                    '$': {"1":["botApi","string",""],"2":["chatId","string",""]}
+                    '$': {"2":["chatId","string",""]}
                 },
                 UpdateCmdRes: {
-                    '$': {"1":["commands","<default.PTP.Common.PbCommands",null],"2":["chatId","string",""]}
+                    '$': {"1":["commands","<default.PTP.Common.PbCommands",null],"2":["chatId","string",""],"3":["startTips","string",""]}
                 },
                 UploadMsgReq: {
-                    '$': {"1":["messages","<default.PTP.Common.MessageStoreRow",null],"2":["chatId","string",""],"3":["time","uint32",0]}
+                    '$': {"1":["messages","<bytes",null],"2":["chatId","string",""]}
                 },
                 UploadMsgRes: {
-                    '$': {"100":["err","uint32",0]}
+                    '$': {"1":["userMessageStoreData","default.PTP.Common.UserMessageStoreData",null],"100":["err","uint32",0]}
                 }
             },
             Other: {
@@ -859,20 +883,38 @@ var $conv_message = $createConverter([
                 }
             },
             User: {
+                CreateUserReq: {
+                    '$': {"1":["username","string",""]}
+                },
+                CreateUserRes: {
+                    '$': {}
+                },
                 DownloadUserReq: {
-                    '$': {"1":["userIds","<string",null]}
+                    '$': {"2":["userId","string",""],"3":["updatedAt","uint32",0]}
                 },
                 DownloadUserRes: {
-                    '$': {"1":["users","<default.PTP.Common.UserStoreRow",null],"100":["err","uint32",0]}
+                    '$': {"2":["userBuf","bytes",[]],"100":["err","uint32",0]}
+                },
+                FetchBotSettingReq: {
+                    '$': {"1":["key","string",""]}
+                },
+                FetchBotSettingRes: {
+                    '$': {"1":["key","string",""],"2":["value","string",""]}
                 },
                 GenUserIdReq: {
-                    '$': {}
+                    '$': {"1":["username","string",""]}
                 },
                 GenUserIdRes: {
                     '$': {"1":["userId","uint32",0],"100":["err","uint32",0]}
                 },
+                SaveBotSettingReq: {
+                    '$': {"1":["key","string",""],"2":["value","string",""]}
+                },
+                SaveBotSettingRes: {
+                    '$': {"100":["err","uint32",0]}
+                },
                 ShareBotReq: {
-                    '$': {"1":["userId","string",""],"2":["firstName","string",""],"3":["avatarHash","string",""],"4":["bio","string",""],"5":["init_system_content","string",""],"6":["welcome","string",""],"7":["template","string",""]}
+                    '$': {"1":["catTitle","string",""],"2":["catBot","default.PTP.Common.PbCatBot",null]}
                 },
                 ShareBotRes: {
                     '$': {"100":["err","uint32",0]}
@@ -884,7 +926,7 @@ var $conv_message = $createConverter([
                     '$': {"100":["err","uint32",0]}
                 },
                 UploadUserReq: {
-                    '$': {"1":["users","<default.PTP.Common.UserStoreRow",null],"3":["time","uint32",0]}
+                    '$': {"2":["userBuf","bytes",[]]}
                 },
                 UploadUserRes: {
                     '$': {"100":["err","uint32",0]}
