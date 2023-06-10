@@ -1,8 +1,8 @@
 {
-  "name": "wai-chat-bot-electron-chatgpt",
+  "name": "wai-chat-desktopt",
   "productName": "Wai Chat",
   "version": "1.1.1",
-  "description": "a electron project for wai chat bot",
+  "description": "a electron project for wai chat",
   "main": ".webpack/main",
   "scripts": {
     "start": "electron-forge start",
